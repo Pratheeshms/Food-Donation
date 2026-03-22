@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <springProperty name="HOME_PATH" source="com.log.path" defaultValue="/Logs"/>
+    <springProperty name="MODULE_NAME" source="com.module" defaultValue="Food-Donation"/>
+    <springProperty name="MAX_FILE_SIZE" source="com.log.max-file-size" defaultValue="1MB"/>
+    <springProperty name="TOTAL_SIZE_CAP" source="com.log.total-size-cap" defaultValue="10GB"/>
+    <springProperty name="MAX_HISTORY" source="com.log.max-history" defaultValue="30"/>
+    <springProperty name="LOG_LEVEL" source="com.log.level" defaultValue="INFO"/>
+    <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${HOME_PATH}/${MODULE_NAME}/${MODULE_NAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${HOME_PATH}/${MODULE_NAME}/archival/${MODULE_NAME}app.log.%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <!-- each archived file, size max 10MB -->
+            <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+            <!-- total size of all archive files, if total size > 20GB,
+				it will delete old archived file -->
+            <totalSizeCap>${TOTAL_SIZE_CAP}</totalSizeCap>
+            <!-- 60 days to keep -->
+            <maxHistory>${maxHistory:-10}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d %p %c{1} [%t] %m%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="com" level="DEBUG" additivity="false">
+        <appender-ref ref="FILE-ROLLING"/>
+    </logger>
+    <root level="${LOG_LEVEL}">
+        <appender-ref ref="FILE-ROLLING"/>
+    </root>
+</configuration>

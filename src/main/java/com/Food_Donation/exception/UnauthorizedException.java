@@ -1,0 +1,8 @@
+package com.Food_Donation.exception;
+
+public class UnauthorizedException extends RuntimeException{
+
+    public UnauthorizedException(String message){
+        super(message);
+    }
+}
