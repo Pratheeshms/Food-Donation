@@ -27,6 +27,15 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 request);
     }
+    @ExceptionHandler(EmptyDataException.class)
+    public ResponseEntity<CustomErrorResponse> handleNotFoundWithOk(
+            EmptyDataException ex,
+            HttpServletRequest request) {
+
+        return buildResponse(ex.getMessage(),
+                HttpStatus.OK,
+                request);
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<CustomErrorResponse> handleBadRequest(
@@ -54,15 +63,6 @@ public class GlobalExceptionHandler {
                 .body(ex.getMessage());
     }
 
-//    @ExceptionHandler(UnauthorizedException.class)
-//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-//    public Map<String, Object> handleUnauthorized(UnauthorizedException ex) {
-//        Map<String, Object> error = new HashMap<>();
-//        error.put("message", ex.getMessage());
-//        error.put("status", 401);
-//        error.put("time", LocalDateTime.now());
-//        return error;
-//    }
 @ExceptionHandler(UnauthorizedException.class)
 public ResponseEntity<CustomErrorResponse> handleUnauthorized(
         UnauthorizedException ex,

@@ -3,6 +3,7 @@ package com.Food_Donation.controller;
 import com.Food_Donation.configuration.SecurityConfig;
 import com.Food_Donation.dto.NGORegistrationDTO;
 import com.Food_Donation.entity.NGORegistration;
+import com.Food_Donation.exception.UnauthorizedException;
 import com.Food_Donation.service.NGOService;
 import com.Food_Donation.utils.AppConstant;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,5 +46,25 @@ public class NGORegistrationController {
         NGORegistration ngoRegistration = ngoService.findById(userId);
         return ResponseEntity.ok().body(ngoRegistration);
     }
+
+    @GetMapping("/admin")
+    public ResponseEntity<List<NGORegistration>> responseEntity(HttpServletRequest request){
+
+        String authHeader = request.getHeader("Authorization");
+        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new UnauthorizedException("Missing or Invalid Authorization Header");
+        }
+        String token = authHeader.substring(7);
+
+
+        Long userId = securityConfig.extractUserId(token);
+        String role = securityConfig.extractRole(token);
+        List<NGORegistration> ngoRegistration = ngoService.findByRoles(userId,role);
+
+        return ResponseEntity.ok().body(ngoRegistration);
+
+    }
+
+
 
 }

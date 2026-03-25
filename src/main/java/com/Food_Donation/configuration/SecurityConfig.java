@@ -45,16 +45,17 @@ public class SecurityConfig {
 
         return http.build();
     }
-    public Long extractUserId(String token) {
+    public Claims extractAllClaims(String token) {
 
         try {
-            Claims claims = Jwts.parserBuilder()
+//            Claims claims = Jwts.parserBuilder()
+            return Jwts.parserBuilder()
                     .setSigningKey(secret.getBytes(StandardCharsets.UTF_8))
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
 
-            return claims.get("userId", Long.class);
+//            return claims.get("userId", Long.class);
         }
         catch (Exception e)
         {
@@ -62,6 +63,13 @@ public class SecurityConfig {
         }
     }
 
+    public Long extractUserId(String token) {
+        return extractAllClaims(token).get("userId", Long.class);
+    }
+
+    public String extractRole(String token) {
+        return extractAllClaims(token).get("role", String.class);
+    }
     public String generateToken(Long userId, String username, String role) {
 
         Key key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));

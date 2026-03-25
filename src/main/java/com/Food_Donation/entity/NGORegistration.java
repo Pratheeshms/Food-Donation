@@ -1,5 +1,6 @@
 package com.Food_Donation.entity;
 
+import com.Food_Donation.enums.EscalatedTo;
 import com.Food_Donation.enums.NgoStatus;
 import com.Food_Donation.enums.RequestType;
 import jakarta.persistence.*;
@@ -27,5 +28,7 @@ public class NGORegistration {
     @Enumerated(EnumType.STRING)
     private NgoStatus status;
     private LocalDateTime created_at;
+    @Enumerated(EnumType.STRING)
+    private EscalatedTo escalatedTo;
 
 }

@@ -27,6 +27,7 @@ public class UserLoginService {
         }
         UserLogin userLogin = new UserLogin();
         userLogin.setUserName(userLoginDTO.getUserName());
+        userLogin.setRole("DONER");
         userLogin.setPassword(passwordEncoder.encode(userLoginDTO.getPassword()));
 
         userLoginRepository.save(userLogin);
