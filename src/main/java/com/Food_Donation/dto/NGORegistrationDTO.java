@@ -25,5 +25,7 @@ public class NGORegistrationDTO {
     private String regNo;
     private NgoStatus status;
     private LocalDateTime created_at;
+    public LocalDateTime approvedDate;
+
 
 }

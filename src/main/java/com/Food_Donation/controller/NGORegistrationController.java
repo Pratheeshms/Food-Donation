@@ -68,6 +68,13 @@ public class NGORegistrationController {
 
     }
 
+    @PutMapping("/update")
+    public ResponseEntity<NGORegistrationDTO>updates(@RequestBody NGORegistrationDTO ngoRegistrationDTO){
+
+        NGORegistrationDTO saved = ngoService.update(ngoRegistrationDTO);
+        return ResponseEntity.ok().body(saved);
+    }
+
 
 
 }

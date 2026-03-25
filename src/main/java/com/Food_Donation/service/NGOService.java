@@ -76,7 +76,7 @@ public class NGOService {
 
         List<NGORegistration> ngoRegistration = new ArrayList<>();
 
-        if(role.equals("SUPER-ADMIN")) {
+        if(role.equals("SUPER_ADMIN")) {
             ngoRegistration = ngoRepository.findByStatusAndEscalatedToIsNull(NgoStatus.PENDING);
         } else if (role.equals("ADMIN")) {
             ngoRegistration = ngoRepository.findByStatusAndEscalatedTo(NgoStatus.PENDING, EscalatedTo.ADMIN);
@@ -89,5 +89,19 @@ public class NGOService {
             throw new EmptyDataException( "No new request found");
         }
         return ngoRegistration;
+    }
+
+    public NGORegistrationDTO update(NGORegistrationDTO ngoRegistrationDTO) {
+
+        NGORegistration ngo = ngoRepository.findById(ngoRegistrationDTO.getId())
+                .orElseThrow(()-> new EmptyDataException("No new request arrived yet"));
+
+        ngo.setStatus(ngoRegistrationDTO.getStatus());
+        ngo.setApprovedDate(LocalDateTime.now());
+
+        NGORegistration saved = ngoRepository.save(ngo);
+
+        return dataMapper.ModelToDto(saved);
+
     }
 }
