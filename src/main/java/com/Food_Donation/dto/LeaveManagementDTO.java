@@ -1,5 +1,7 @@
 package com.Food_Donation.dto;
 
+import com.Food_Donation.enums.LeaveRequestStatus;
+import com.Food_Donation.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +19,9 @@ public class LeaveManagementDTO {
     private LocalDateTime fromDate;
     private LocalDateTime toDate;
     private Long totalDays;
-    private String role;
+    private Role role;
+    private LeaveRequestStatus status;
+
 
 
 }

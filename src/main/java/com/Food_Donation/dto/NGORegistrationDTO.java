@@ -1,11 +1,10 @@
 package com.Food_Donation.dto;
 
 import com.Food_Donation.enums.NgoStatus;
-import com.Food_Donation.enums.RequestType;
+import com.Food_Donation.enums.NGORequestType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +17,7 @@ public class NGORegistrationDTO {
     private Long userId;
     private String name;
     private String phone;
-    private RequestType requesterType;
+    private NGORequestType requesterType;
     private String address;
     private String city;
     private String pinCode;

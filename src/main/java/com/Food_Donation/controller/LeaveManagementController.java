@@ -20,6 +20,7 @@ public class LeaveManagementController {
     private final LeaveManagementService leaveManagementService;
     private final SecurityConfig securityConfig;
 
+    //create leave request for all employees, admin and super admin
     @PostMapping("/create")
     public ResponseEntity<LeaveManagementDTO>leave (@RequestBody LeaveManagementDTO leaveManagementDTO, HttpServletRequest request) {
 
@@ -33,6 +34,7 @@ public class LeaveManagementController {
         return ResponseEntity.ok().body(leaveManagement);
     }
 
+    //just an ordinary findById
     @GetMapping("/{id}")
     public ResponseEntity<LeaveManagementDTO>leave (@PathVariable Long id){
 
@@ -40,10 +42,18 @@ public class LeaveManagementController {
         return ResponseEntity.ok().body(leaveManagement);
     }
 
+    // just an find to fell all APPROVED data by  Super-ADMIN
     @GetMapping("")
     public ResponseEntity<List<LeaveManagementDTO>>leave (){
 
-        List<LeaveManagementDTO> leaveManagement = leaveManagementService.findAll();
+        List<LeaveManagementDTO> leaveManagement = leaveManagementService.findAllApproved();
+        return ResponseEntity.ok().body(leaveManagement);
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<List<LeaveManagementDTO>>PendingLeaves (){
+
+        List<LeaveManagementDTO> leaveManagement = leaveManagementService.findAllPending();
         return ResponseEntity.ok().body(leaveManagement);
     }
 

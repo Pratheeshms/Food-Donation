@@ -2,7 +2,8 @@ package com.Food_Donation.service;
 
 import com.Food_Donation.dto.LeaveManagementDTO;
 import com.Food_Donation.entity.LeaveManagement;
-import com.Food_Donation.enums.RequestStatus;
+import com.Food_Donation.enums.LeaveRequestStatus;
+import com.Food_Donation.enums.Role;
 import com.Food_Donation.exception.EmptyDataException;
 import com.Food_Donation.exception.ResourceNotFoundException;
 import com.Food_Donation.repository.LeaveManagementRepository;
@@ -33,11 +34,11 @@ public class LeaveManagementService {
 
         LeaveManagement saved = dataMapper.DtoToModel(leaveManagementDTO);
         saved.setUserId(userId);
-        saved.setRole(role);
-        if (saved.getRole().equals("SUPER-ADMIN")){
+        saved.setRole(Role.valueOf(role));
+        if (saved.getRole().equals("SUPER_ADMIN")){
             saved.setStatus(null);
         }else
-        saved.setStatus(RequestStatus.PENDING);
+        saved.setStatus(LeaveRequestStatus.PENDING);
 
         Long day = ChronoUnit.DAYS.between(
                 saved.getFromDate().toLocalDate(),
@@ -57,16 +58,28 @@ public class LeaveManagementService {
                 .orElseThrow(()-> new ResourceNotFoundException("Leave not found with id " + id));
         return dataMapper.ModelToDto(leaveManagement);
     }
-
-    public List<LeaveManagementDTO> findAll() {
+    public List<LeaveManagementDTO> findAllApproved() {
 
         if (leaveManagementRepository.findAll().isEmpty()){
             throw new EmptyDataException("No leave record found");
         }
-        List<LeaveManagementDTO> leave = leaveManagementRepository.findAll()
+        List<LeaveManagementDTO> leave = leaveManagementRepository.findAllByStatusOrRole(LeaveRequestStatus.APPROVED_BY_ADMIN, Role.ADMIN)
                 .stream()
                 .map(dataMapper::ModelToDto)
                 .toList();
         return leave;
+    }
+
+    public List<LeaveManagementDTO> findAllPending() {
+
+            List<LeaveManagement> list =
+                    leaveManagementRepository.findAllByStatus(LeaveRequestStatus.PENDING);
+
+            if (list.isEmpty()) {
+                throw new EmptyDataException("No leave record found");
+            }
+            return list.stream()
+                    .map(dataMapper::ModelToDto)
+                    .toList();
     }
 }

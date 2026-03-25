@@ -25,6 +25,7 @@ public class NGORegistrationController {
     private final NGOService ngoService;
     private final SecurityConfig securityConfig;
 
+    //while someone registration, if SUB ADMIN is on leave request goes to ADMIN
     @PostMapping("/create")
     public ResponseEntity<NGORegistrationDTO> nog(@RequestBody NGORegistrationDTO ngoRegistrationDTO, HttpServletRequest request)
     {
@@ -36,6 +37,7 @@ public class NGORegistrationController {
         return ResponseEntity.ok().body(saved);
     }
 
+//    this API for registration guys to view their requested application
     @GetMapping("/user")
     public ResponseEntity<NGORegistration> ngoRegistration(HttpServletRequest request){
 
@@ -47,6 +49,7 @@ public class NGORegistrationController {
         return ResponseEntity.ok().body(ngoRegistration);
     }
 
+//    API to get all pending registration to ADMIN and Sub ADMIN
     @GetMapping("/admin")
     public ResponseEntity<List<NGORegistration>> responseEntity(HttpServletRequest request){
 

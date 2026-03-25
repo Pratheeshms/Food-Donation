@@ -1,11 +1,9 @@
 package com.Food_Donation.entity;
 
-import com.Food_Donation.enums.RequestStatus;
+import com.Food_Donation.enums.LeaveRequestStatus;
+import com.Food_Donation.enums.Role;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -23,9 +21,10 @@ public class LeaveManagement {
     private LocalDateTime fromDate;
     private LocalDateTime toDate;
     private Long totalDays;
-    private String role;
     @Enumerated(EnumType.STRING)
-    private RequestStatus status;
+    private Role role;
+    @Enumerated(EnumType.STRING)
+    private LeaveRequestStatus status;
 
 
 }

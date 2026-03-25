@@ -2,7 +2,7 @@ package com.Food_Donation.entity;
 
 import com.Food_Donation.enums.EscalatedTo;
 import com.Food_Donation.enums.NgoStatus;
-import com.Food_Donation.enums.RequestType;
+import com.Food_Donation.enums.NGORequestType;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -19,7 +19,7 @@ public class NGORegistration {
     private String name;
     private String phone;
     @Enumerated(EnumType.STRING)
-    private RequestType requesterType;
+    private NGORequestType requesterType;
     private String address;
     private String city;
     private String pinCode;
