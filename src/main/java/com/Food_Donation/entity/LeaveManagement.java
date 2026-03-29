@@ -25,6 +25,11 @@ public class LeaveManagement {
     private Role role;
     @Enumerated(EnumType.STRING)
     private LeaveRequestStatus status;
+    private LocalDateTime approvedDate;
+
+    @ManyToOne
+    @JoinColumn(name = "userId", referencedColumnName = "id", insertable = false, updatable = false)
+    private UserLogin userDetail;
 
 
 }

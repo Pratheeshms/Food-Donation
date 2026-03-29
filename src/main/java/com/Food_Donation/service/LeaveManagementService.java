@@ -2,17 +2,22 @@ package com.Food_Donation.service;
 
 import com.Food_Donation.dto.LeaveManagementDTO;
 import com.Food_Donation.entity.LeaveManagement;
+import com.Food_Donation.entity.NGORegistration;
+import com.Food_Donation.entity.UserLogin;
 import com.Food_Donation.enums.LeaveRequestStatus;
 import com.Food_Donation.enums.Role;
 import com.Food_Donation.exception.EmptyDataException;
 import com.Food_Donation.exception.ResourceNotFoundException;
 import com.Food_Donation.repository.LeaveManagementRepository;
+import com.Food_Donation.repository.UserLoginRepository;
 import com.Food_Donation.utils.DataMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -22,6 +27,7 @@ public class LeaveManagementService {
 
     private final LeaveManagementRepository leaveManagementRepository;
     private final DataMapper dataMapper;
+    private final UserLoginRepository userLoginRepository;
 
     public LeaveManagementDTO create(LeaveManagementDTO leaveManagementDTO, Long userId, String role) {
 
@@ -56,6 +62,12 @@ public class LeaveManagementService {
 
         LeaveManagement leaveManagement = leaveManagementRepository.findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("Leave not found with id " + id));
+
+//        UserLogin user = userLoginRepository.findById(leaveManagement.getUserId())
+//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+//        LeaveManagementDTO dto = dataMapper.ModelToDto(leaveManagement);
+//        dto.setName(user.getUserName());
+
         return dataMapper.ModelToDto(leaveManagement);
     }
     public List<LeaveManagementDTO> findAllApproved() {
@@ -81,5 +93,18 @@ public class LeaveManagementService {
             return list.stream()
                     .map(dataMapper::ModelToDto)
                     .toList();
+    }
+
+    public LeaveManagementDTO update(LeaveManagementDTO leaveManagementDTO) {
+        LeaveManagement leave = leaveManagementRepository.findById(leaveManagementDTO.getId())
+                .orElseThrow(()-> new EmptyDataException("No new leave request record found"));
+
+        leave.setStatus(leaveManagementDTO.getStatus());
+        leave.setApprovedDate(LocalDateTime.now());
+
+        LeaveManagement saved = leaveManagementRepository.save(leave);
+
+        return dataMapper.ModelToDto(saved);
+
     }
 }

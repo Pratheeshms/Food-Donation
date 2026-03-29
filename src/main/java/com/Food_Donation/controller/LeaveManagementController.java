@@ -2,6 +2,7 @@ package com.Food_Donation.controller;
 
 import com.Food_Donation.configuration.SecurityConfig;
 import com.Food_Donation.dto.LeaveManagementDTO;
+import com.Food_Donation.dto.NGORegistrationDTO;
 import com.Food_Donation.entity.LeaveManagement;
 import com.Food_Donation.service.LeaveManagementService;
 import com.Food_Donation.utils.AppConstant;
@@ -58,5 +59,10 @@ public class LeaveManagementController {
     }
 
 
+    @PutMapping("/update")
+    public ResponseEntity<LeaveManagementDTO>updates(@RequestBody LeaveManagementDTO leaveManagementDTO){
 
+        LeaveManagementDTO saved = leaveManagementService.update(leaveManagementDTO);
+        return ResponseEntity.ok().body(saved);
+    }
 }

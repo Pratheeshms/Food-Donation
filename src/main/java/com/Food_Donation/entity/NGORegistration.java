@@ -30,7 +30,7 @@ public class NGORegistration {
     private LocalDateTime created_at;
     @Enumerated(EnumType.STRING)
     private EscalatedTo escalatedTo;
-    public LocalDateTime approvedDate;
-
+    private LocalDateTime approvedDate;
+    private String documentKey;
 
 }

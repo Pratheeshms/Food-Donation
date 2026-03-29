@@ -12,8 +12,10 @@ import com.Food_Donation.repository.LeaveManagementRepository;
 import com.Food_Donation.repository.NGORepository;
 import com.Food_Donation.utils.DataMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -21,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -29,14 +32,19 @@ public class NGOService {
     private final NGORepository ngoRepository;
     private final DataMapper dataMapper;
     private final LeaveManagementRepository leaveManagementRepository;
+    private final S3Service s3Service;
 
-    public NGORegistrationDTO create(NGORegistrationDTO ngoRegistrationDTO, Long userId) {
+
+    public NGORegistrationDTO create(NGORegistrationDTO ngoRegistrationDTO, MultipartFile document, Long userId) {
+
 
         LeaveManagement leaveManagement = new LeaveManagement();
         if (ngoRepository.existsByOrgName(ngoRegistrationDTO.getOrgName()))
         {
             throw new DuplicateResourceException("Org Name "+ ngoRegistrationDTO.getOrgName()+" already exist");
         }
+        String key = s3Service.uploadFile(document);
+
         // Check SUPER_ADMIN on leave today
         LocalDate today = LocalDate.now();
 
@@ -53,6 +61,7 @@ public class NGOService {
         ngoRegistration.setStatus(NgoStatus.PENDING);
         ngoRegistration.setUserId(userId);
         ngoRegistration.setCreated_at(LocalDateTime.now());
+        ngoRegistration.setDocumentKey(key);
 
         if (superAdminOnLeave) {
             ngoRegistration.setEscalatedTo(EscalatedTo.ADMIN);
@@ -103,5 +112,15 @@ public class NGOService {
 
         return dataMapper.ModelToDto(saved);
 
+    }
+
+    public String getDocumentKeys(Long id) {
+
+        NGORegistration ngo = ngoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("NGO not found"));
+
+        String documentKey = ngo.getDocumentKey();
+
+        return s3Service.generatePresignedUrl(documentKey);
     }
 }

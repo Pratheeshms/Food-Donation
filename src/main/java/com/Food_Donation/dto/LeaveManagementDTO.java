@@ -1,7 +1,10 @@
 package com.Food_Donation.dto;
 
+import com.Food_Donation.entity.UserLogin;
 import com.Food_Donation.enums.LeaveRequestStatus;
 import com.Food_Donation.enums.Role;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,7 +24,7 @@ public class LeaveManagementDTO {
     private Long totalDays;
     private Role role;
     private LeaveRequestStatus status;
-
+    private LocalDateTime approvedDate;
 
 
 }
