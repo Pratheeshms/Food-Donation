@@ -1,6 +1,7 @@
 package com.Food_Donation.service;
 
 import com.Food_Donation.dto.NGORegistrationDTO;
+import com.Food_Donation.dto.S3FIleResponseDTO;
 import com.Food_Donation.entity.LeaveManagement;
 import com.Food_Donation.entity.NGORegistration;
 import com.Food_Donation.enums.EscalatedTo;
@@ -114,13 +115,21 @@ public class NGOService {
 
     }
 
-    public String getDocumentKeys(Long id) {
+    public S3FIleResponseDTO getDocumentKeys(Long id) {
 
         NGORegistration ngo = ngoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("NGO not found"));
 
         String documentKey = ngo.getDocumentKey();
+        String presignedUrl = s3Service.generatePresignedUrl(documentKey);
+//        LocalDateTime expire = s3Service.
+                LocalDateTime expiryTime = LocalDateTime.now()
+                .plusMinutes(s3Service.getExpiration());
 
-        return s3Service.generatePresignedUrl(documentKey);
+        S3FIleResponseDTO s3FIleResponseDTO = new S3FIleResponseDTO();
+        s3FIleResponseDTO.setDocumentUrl(presignedUrl);
+        s3FIleResponseDTO.setExpiryTime(expiryTime);
+
+        return s3FIleResponseDTO;
     }
 }

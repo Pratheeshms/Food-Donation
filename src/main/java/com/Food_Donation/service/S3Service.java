@@ -1,5 +1,7 @@
 package com.Food_Donation.service;
 
+import com.Food_Donation.configuration.S3Config;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,12 +18,13 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class S3Service {
-
     private final S3Client s3Client;
+    private final S3Presigner preSigner;
 
     @Value("${application.bucket.name}")
     private String bucketName;
@@ -34,6 +37,11 @@ public class S3Service {
 
     @Value("${cloud.aws.credentials.secret-key}")
     private String secretKey;
+
+    @Getter
+    @Value("${cloud.aws.s3-document.preSigned-url-expiration}")
+    private int expiration;
+
     public String uploadFile(MultipartFile file) {
         try {
             String key = folderName + "/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
@@ -57,35 +65,15 @@ public class S3Service {
 
     //this method for security purpose after we save the folder as private we need this method to access the file or image ,
     // its safest production level method
-//
-//    public String generatePresignedUrl(String key) {
-//        S3Presigner presigner = S3Presigner.create();
-//
-//        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-//                .bucket(bucketName)
-//                .key(key)
-//                .build();
-//
-//        GetObjectPresignRequest presignRequest =
-//                GetObjectPresignRequest.builder()
-//                        .signatureDuration(Duration.ofMinutes(10))
-//                        .getObjectRequest(getObjectRequest)
-//                        .build();
-//
-//        PresignedGetObjectRequest presignedRequest =
-//                presigner.presignGetObject(presignRequest);
-//
-//        return presignedRequest.url().toString();
-//    }
 
     public String generatePresignedUrl(String key) {
         try {
-            S3Presigner presigner = S3Presigner.builder()
-                    .region(Region.EU_NORTH_1) // IMPORTANT
-                    .credentialsProvider(StaticCredentialsProvider.create(
-                            AwsBasicCredentials.create(accessKey, secretKey)
-                    ))
-                    .build();
+//            S3Presigner presigner = S3Presigner.builder()
+//                    .region(Region.EU_NORTH_1) // IMPORTANT
+//                    .credentialsProvider(StaticCredentialsProvider.create(
+//                            AwsBasicCredentials.create(accessKey, secretKey)
+//                    ))
+//                    .build();
 
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucketName)
@@ -94,12 +82,12 @@ public class S3Service {
 
             GetObjectPresignRequest presignRequest =
                     GetObjectPresignRequest.builder()
-                            .signatureDuration(Duration.ofMinutes(10))
+                            .signatureDuration(Duration.ofMinutes(expiration))
                             .getObjectRequest(getObjectRequest)
                             .build();
 
             PresignedGetObjectRequest presignedRequest =
-                    presigner.presignGetObject(presignRequest);
+                    preSigner.presignGetObject(presignRequest);
 
             return presignedRequest.url().toString();
 
@@ -108,4 +96,6 @@ public class S3Service {
             throw new RuntimeException("Error generating presigned URL");
         }
     }
+
+
 }

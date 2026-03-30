@@ -25,9 +25,9 @@ public class UserLogin {
     @PostMapping("/login")
     public LoginResponseDTO userLogins(@RequestBody UserLoginDTO userLoginDTO)
     {
-        String token = userLoginService.login(userLoginDTO);
+        LoginResponseDTO token = userLoginService.login(userLoginDTO);
 
-        return new  LoginResponseDTO(token);
+        return token;
     }
 
 }

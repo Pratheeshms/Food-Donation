@@ -1,10 +1,9 @@
 package com.Food_Donation.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Entity
@@ -16,4 +15,8 @@ public class UserLogin {
     private String userName;
     private String password;
     private String role;
+
+//    not necessary just an optional but good
+    @OneToMany(mappedBy = "userLogin", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RefreshToken> refreshTokens;
 }

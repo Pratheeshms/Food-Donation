@@ -26,6 +26,9 @@ public class SecurityConfig {
     @Value("${jwt.secret}")
     private String secret;
 
+    @Value("${jwt.access.expiration}")
+    private String accessTokenExpire;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -79,7 +82,7 @@ public class SecurityConfig {
                 .claim("userId",userId)
                 .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpire)) // 1 hour
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }

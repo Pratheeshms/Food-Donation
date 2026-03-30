@@ -2,6 +2,7 @@ package com.Food_Donation.controller;
 
 import com.Food_Donation.configuration.SecurityConfig;
 import com.Food_Donation.dto.NGORegistrationDTO;
+import com.Food_Donation.dto.S3FIleResponseDTO;
 import com.Food_Donation.entity.NGORegistration;
 import com.Food_Donation.exception.ResourceNotFoundException;
 import com.Food_Donation.exception.UnauthorizedException;
@@ -46,9 +47,9 @@ public class NGORegistrationController {
         return ResponseEntity.ok().body(saved);
     }
     @GetMapping("/document/{id}")
-    public ResponseEntity<String> getDocument(@PathVariable Long id) {
+    public ResponseEntity<S3FIleResponseDTO> getDocument(@PathVariable Long id) {
 
-        String presignedUrl = ngoService.getDocumentKeys(id);
+        S3FIleResponseDTO presignedUrl = ngoService.getDocumentKeys(id);
 
         return ResponseEntity.ok(presignedUrl);
     }
