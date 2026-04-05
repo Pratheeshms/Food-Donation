@@ -47,14 +47,25 @@ public class GlobalExceptionHandler {
                 request);
     }
 
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<CustomErrorResponse> handleGeneric(
+//            Exception ex,
+//            HttpServletRequest request) {
+//
+//        return buildResponse("Something went wrong",
+//                HttpStatus.INTERNAL_SERVER_ERROR,
+//                request);
+//    }
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<CustomErrorResponse> handleGeneric(
-            Exception ex,
-            HttpServletRequest request) {
+    public ResponseEntity<?> handleExceptions(Exception ex) {
 
-        return buildResponse("Something went wrong",
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                request);
+        ex.printStackTrace(); // THIS LINE IS IMPORTANT
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of(
+                        "error", ex.getClass().getSimpleName(),
+                        "message", ex.getMessage()
+                ));
     }
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<String> handleException(ResponseStatusException ex) {

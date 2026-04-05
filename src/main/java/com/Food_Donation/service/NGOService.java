@@ -39,7 +39,7 @@ public class NGOService {
     public NGORegistrationDTO create(NGORegistrationDTO ngoRegistrationDTO, MultipartFile document, Long userId) {
 
 
-        LeaveManagement leaveManagement = new LeaveManagement();
+//        LeaveManagement leaveManagement = new LeaveManagement();
         if (ngoRepository.existsByOrgName(ngoRegistrationDTO.getOrgName()))
         {
             throw new DuplicateResourceException("Org Name "+ ngoRegistrationDTO.getOrgName()+" already exist");
@@ -61,7 +61,7 @@ public class NGOService {
         NGORegistration ngoRegistration= dataMapper.DtoToModel(ngoRegistrationDTO);
         ngoRegistration.setStatus(NgoStatus.PENDING);
         ngoRegistration.setUserId(userId);
-        ngoRegistration.setCreated_at(LocalDateTime.now());
+        ngoRegistration.setCreatedAt(LocalDateTime.now());
         ngoRegistration.setDocumentKey(key);
 
         if (superAdminOnLeave) {

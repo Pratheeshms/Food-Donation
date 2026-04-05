@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-public class NGORegistration {
+public class NGORegistration extends AbstractEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public class NGORegistration {
     private String regNo;
     @Enumerated(EnumType.STRING)
     private NgoStatus status;
-    private LocalDateTime created_at;
+//    private LocalDateTime createdAt;
     @Enumerated(EnumType.STRING)
     private EscalatedTo escalatedTo;
     private LocalDateTime approvedDate;

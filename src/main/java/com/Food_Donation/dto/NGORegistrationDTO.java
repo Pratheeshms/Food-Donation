@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NGORegistrationDTO {
+public class NGORegistrationDTO extends AbstractDTO {
 
     private Long id;
     private Long userId;
@@ -24,7 +24,6 @@ public class NGORegistrationDTO {
     private String orgName;
     private String regNo;
     private NgoStatus status;
-    private LocalDateTime created_at;
     private LocalDateTime approvedDate;
     private String documentKey;
 

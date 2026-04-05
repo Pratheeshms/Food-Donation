@@ -27,7 +27,7 @@ public class SecurityConfig {
     private String secret;
 
     @Value("${jwt.access.expiration}")
-    private String accessTokenExpire;
+    private Long accessTokenExpire;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

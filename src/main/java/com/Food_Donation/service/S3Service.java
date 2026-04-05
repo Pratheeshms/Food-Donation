@@ -11,12 +11,15 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -31,6 +34,13 @@ public class S3Service {
 
     @Value("${application.folder.name}")
     private String folderName;
+
+    @Getter
+    @Value("${application.baseUrl}")
+    private String baseUrl;
+
+    @Value("${application.folder.imageName}")
+    private String imageFolderName;
 
     @Value("${cloud.aws.credentials.access-key}")
     private String accessKey;
@@ -63,6 +73,36 @@ public class S3Service {
         }
     }
 
+    public String uploadImage(MultipartFile file) {
+        try {
+            String originalFileName = file.getOriginalFilename();
+
+            String cleanFileName = originalFileName
+                    .replaceAll("\\s+", "_")
+                    .replaceAll("[^a-zA-Z0-9._-]", "");
+            String imageKey = imageFolderName + "/" + System.currentTimeMillis() + "_" + cleanFileName;
+
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(imageKey)
+                    .contentType(file.getContentType())
+                    .build();
+
+            s3Client.putObject(putObjectRequest,
+                    RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+
+            return imageKey;
+//            return "https://" + bucketName + ".s3.amazonaws.com/" + key;
+
+        } catch (Exception e) {
+            throw new RuntimeException("File upload failed");
+        }
+    }
+    public String getImageUrl(String key) {
+        String encodedKey = URLEncoder.encode(key, StandardCharsets.UTF_8);
+        return baseUrl + encodedKey.replace("+", "%20");
+//        return baseUrl + key;
+    }
     //this method for security purpose after we save the folder as private we need this method to access the file or image ,
     // its safest production level method
 
@@ -96,6 +136,20 @@ public class S3Service {
             throw new RuntimeException("Error generating presigned URL");
         }
     }
+//UPDATE
 
+    public void deleteImage(String key) {
+        try {
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build();
+
+            s3Client.deleteObject(deleteObjectRequest);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete image from S3");
+        }
+    }
 
 }

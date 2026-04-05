@@ -8,7 +8,9 @@ import java.time.LocalDateTime;
 @Data
 public class S3FIleResponseDTO {
 
+//    private String imageUrl;
     private String documentUrl;
+    private String imageKey;
     private LocalDateTime expiryTime;
 
 }
