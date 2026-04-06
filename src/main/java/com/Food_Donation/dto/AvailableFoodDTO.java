@@ -26,5 +26,6 @@ private LocalDateTime expiryTime;
     private FoodStatus status;
     private Long restaurantId;
 
+
     private List<FoodImageDTO> foodImageDTOList;
 }

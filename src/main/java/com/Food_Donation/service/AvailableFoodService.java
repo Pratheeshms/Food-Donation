@@ -4,19 +4,13 @@ import com.Food_Donation.dto.AvailableFoodDTO;
 import com.Food_Donation.dto.FoodImageDTO;
 import com.Food_Donation.entity.AvailableFood;
 import com.Food_Donation.entity.FoodImage;
-import com.Food_Donation.entity.LeaveManagement;
-import com.Food_Donation.entity.RestaurantDetails;
 import com.Food_Donation.enums.FoodStatus;
 import com.Food_Donation.exception.DuplicateResourceException;
 import com.Food_Donation.exception.ResourceNotFoundException;
 import com.Food_Donation.repository.AvailableFoodRepository;
 import com.Food_Donation.repository.FoodImageRepository;
 import com.Food_Donation.utils.DataMapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.apache.http.protocol.HTTP;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -223,5 +217,20 @@ public class AvailableFoodService {
             });
         }
         return response;
+    }
+
+    public AvailableFoodDTO stockStatus(Long id, AvailableFoodDTO availableFoodDTO) {
+
+        AvailableFood availableFood = availableFoodRepository.findById(id)
+                .orElseThrow(()-> new RuntimeException("Food not available"));
+
+        availableFood.setActive(availableFoodDTO.isActive());
+
+        availableFood= availableFoodRepository.save(availableFood);
+
+         AvailableFoodDTO dto = dataMapper.ModelToDto(availableFood);
+
+         return dto;
+
     }
 }

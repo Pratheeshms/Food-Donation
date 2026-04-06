@@ -54,4 +54,12 @@ public class AvailableFoodController {
         AvailableFoodDTO saved = availableFoodService.update(availableFoodDTO.getId(),availableFoodDTO, imageDto);
         return ResponseEntity.ok().body(saved);
     }
+
+    @PatchMapping("/stock-status")
+    public ResponseEntity<AvailableFoodDTO> stock(@RequestBody AvailableFoodDTO availableFoodDTO)
+    {
+        AvailableFoodDTO saved = availableFoodService.stockStatus(availableFoodDTO.getId(), availableFoodDTO);
+
+        return ResponseEntity.ok().body(saved);
+    }
 }

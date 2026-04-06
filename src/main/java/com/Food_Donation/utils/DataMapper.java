@@ -25,11 +25,14 @@ public interface DataMapper {
 //    @Mapping(source = "restaurantId", target = "restaurantDetails.id")
     AvailableFood DtoToModel(AvailableFoodDTO availableFoodDTO);
 
+    @Mapping(source = "restaurantDetails.id", target = "restaurantId")
     @Mapping(source = "foodImageList", target = "foodImageDTOList")
     AvailableFoodDTO ModelToDto(AvailableFood availableFood);
 
 //    @Mapping(target = "availableFood", ignore = true)
+    @Mapping(source = "availableFood.id", target = "foodId")
     FoodImageDTO foodImageToDto(FoodImage foodImage);
+
     List<FoodImageDTO> foodImageListToDto(List<FoodImage> foodImageList);
 
     RestaurantDetails DtoToModel(RestaurantDetailsDTO restaurantDetailsDTO);
