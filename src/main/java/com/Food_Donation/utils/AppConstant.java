@@ -6,6 +6,7 @@ public class AppConstant {
 
     public static final String REFRESH_TOKEN = "/refresh";
     public static final String AVAILABLE_FOOD= "/food-config";
+    public static final String FOOD_REQUEST= "/food-request";
 
 
 //    public static final String NGO_DOCS = "ngo-documents";

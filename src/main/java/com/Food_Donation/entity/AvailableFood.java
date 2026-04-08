@@ -2,7 +2,9 @@ package com.Food_Donation.entity;
 
 import com.Food_Donation.enums.FoodStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

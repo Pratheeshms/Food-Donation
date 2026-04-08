@@ -101,20 +101,12 @@ public class S3Service {
     public String getImageUrl(String key) {
         String encodedKey = URLEncoder.encode(key, StandardCharsets.UTF_8);
         return baseUrl + encodedKey.replace("+", "%20");
-//        return baseUrl + key;
     }
     //this method for security purpose after we save the folder as private we need this method to access the file or image ,
     // its safest production level method
 
     public String generatePresignedUrl(String key) {
         try {
-//            S3Presigner presigner = S3Presigner.builder()
-//                    .region(Region.EU_NORTH_1) // IMPORTANT
-//                    .credentialsProvider(StaticCredentialsProvider.create(
-//                            AwsBasicCredentials.create(accessKey, secretKey)
-//                    ))
-//                    .build();
-
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucketName)
                     .key(key)

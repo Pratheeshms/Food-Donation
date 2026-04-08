@@ -1,7 +1,9 @@
 package com.Food_Donation.service;
 
 import com.Food_Donation.dto.AvailableFoodDTO;
+import com.Food_Donation.dto.AvailableFoodPatchDTO;
 import com.Food_Donation.dto.FoodImageDTO;
+import com.Food_Donation.dto.PaginationResponse;
 import com.Food_Donation.entity.AvailableFood;
 import com.Food_Donation.entity.FoodImage;
 import com.Food_Donation.enums.FoodStatus;
@@ -11,13 +13,19 @@ import com.Food_Donation.repository.AvailableFoodRepository;
 import com.Food_Donation.repository.FoodImageRepository;
 import com.Food_Donation.utils.DataMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -62,7 +70,8 @@ public class AvailableFoodService {
         AvailableFoodDTO responseDto = dataMapper.ModelToDto(savedFood);
 
         if (responseDto.getFoodImageDTOList() != null) {
-            responseDto.getFoodImageDTOList().forEach(img -> {
+            responseDto.getFoodImageDTOList()
+                    .forEach(img -> {
                 img.setFoodId(savedFood.getId());
                 img.setImageUrl(s3Service.getImageUrl(img.getImageKey()));
             });
@@ -219,18 +228,150 @@ public class AvailableFoodService {
         return response;
     }
 
-    public AvailableFoodDTO stockStatus(Long id, AvailableFoodDTO availableFoodDTO) {
+    public AvailableFoodPatchDTO stockStatus(Long id, AvailableFoodPatchDTO dto) {
 
-        AvailableFood availableFood = availableFoodRepository.findById(id)
+        AvailableFood food = availableFoodRepository.findById(id)
                 .orElseThrow(()-> new RuntimeException("Food not available"));
 
-        availableFood.setActive(availableFoodDTO.isActive());
+        if (dto.getIsActive() != null) {
+            food.setActive(dto.isActive());
+        }
+        if (dto.getQuantity() != null) {
+            BigDecimal newQuantity = food.getQuantity().add(dto.getQuantity());
 
-        availableFood= availableFoodRepository.save(availableFood);
+            if (newQuantity.compareTo(BigDecimal.ZERO) < 0) {
+                throw new RuntimeException("Quantity cannot be negative");
+            }
+            food.setQuantity(newQuantity);
 
-         AvailableFoodDTO dto = dataMapper.ModelToDto(availableFood);
+        }
+        if (dto.getExpiryTime() != null) {
+            food.setExpiryTime(dto.getExpiryTime());
+        }
 
-         return dto;
+        LocalDateTime now = LocalDateTime.now();
 
+        if (food.getExpiryTime() != null && food.getExpiryTime().isBefore(now)) {
+            food.setStatus(FoodStatus.EXPIRED);
+        }
+        else if (food.getQuantity() != null && food.getQuantity().compareTo(BigDecimal.ZERO) == 0) {
+            food.setStatus(FoodStatus.OUT_OF_STOCK);
+        }
+        else {
+            food.setStatus(FoodStatus.AVAILABLE);
+        }
+
+        food= availableFoodRepository.save(food);
+        return dataMapper.ModelsToDto(food);
+    }
+
+    public AvailableFoodDTO findById(Long id) {
+
+        AvailableFood availableFood = availableFoodRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Food not found with id: " + id));
+
+        List<FoodImageDTO> imageDTOList = new ArrayList<>();
+
+        for (FoodImage image : availableFood.getFoodImageList()) {
+
+            String url = s3Service.getImageUrl(image.getImageKey());
+
+            FoodImageDTO foodImageDTO = new FoodImageDTO();
+            foodImageDTO.setId(image.getId());
+            foodImageDTO.setImageKey(image.getImageKey());
+            foodImageDTO.setImageName(image.getImageName());
+            foodImageDTO.setImageType(image.getImageType());
+            foodImageDTO.setFoodId(image.getAvailableFood().getId());
+            foodImageDTO.setImageUrl(url);
+//            foodImageDTO.setImageUrl(s3Service.getImageUrl(image.getImageKey()));
+
+            imageDTOList.add(foodImageDTO); // 🔥 YOU MISSED THIS
+
+        }
+        AvailableFoodDTO dto = dataMapper.ModelToDto(availableFood);
+
+        dto.setFoodImageDTOList(imageDTOList); // 🔥 THIS LINE IS MISSING
+
+        return dto;
+    }
+
+
+
+    public PaginationResponse<AvailableFoodDTO> findAll(int page, int size) {
+
+        Page<AvailableFood> availableFoods = fetchFoods(page, size);
+
+        Map<Long, List<FoodImage>> imageMap = fetchImage(availableFoods);
+
+        List<AvailableFoodDTO> content = mapToDto(availableFoods, imageMap);
+
+        return buildResponses(page, size, availableFoods, content);
+    }
+
+    private PaginationResponse<AvailableFoodDTO> buildResponses(
+            int page,
+            int size,
+            Page<AvailableFood> availableFoods,
+            List<AvailableFoodDTO> content) {
+
+        return new PaginationResponse<>(
+                page,
+                size,
+                availableFoods.getTotalElements(),
+                content
+        );
+    }
+
+    private List<AvailableFoodDTO> mapToDto(
+            Page<AvailableFood> availableFoods,
+            Map<Long, List<FoodImage>> imageMap) {
+
+        return availableFoods.getContent()
+                .stream()
+                .map(food -> {
+
+                    AvailableFoodDTO dto = dataMapper.ModelToDto(food);
+
+                    List<FoodImage> images = imageMap.get(food.getId());
+
+                    if (images != null) {
+                        List<FoodImageDTO> imageDTOList = images.stream()
+                                .map(img -> {
+                                    FoodImageDTO imageDTO = new FoodImageDTO();
+                                    imageDTO.setId(img.getId());
+                                    imageDTO.setImageKey(img.getImageKey());
+                                    imageDTO.setImageName(img.getImageName());
+                                    imageDTO.setImageType(img.getImageType());
+                                    imageDTO.setImageUrl(s3Service.getImageUrl(img.getImageKey()));
+                                    return imageDTO;
+                                }).toList();
+
+                        dto.setFoodImageDTOList(imageDTOList);
+                    }
+
+                    return dto;
+                })
+                .toList();
+    }
+
+    private Page<AvailableFood> fetchFoods(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size); // 🔥 FIX (0-based)
+        return availableFoodRepository.findAllByActive(true, pageable);
+    }
+
+    private Map<Long, List<FoodImage>> fetchImage(Page<AvailableFood> availableFoods) {
+
+        List<Long> foodId = extractFoodIds(availableFoods);
+
+        return foodImageRepository.findByAvailableFood_IdIn(foodId)
+                .stream()
+                .collect(Collectors.groupingBy(v -> v.getAvailableFood().getId()));
+    }
+
+    private List<Long> extractFoodIds(Page<AvailableFood> availableFoods) {
+        return availableFoods.getContent()
+                .stream()
+                .map(AvailableFood::getId)
+                .toList();
     }
 }

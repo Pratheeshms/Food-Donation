@@ -1,6 +1,5 @@
 package com.Food_Donation.dto;
 
-import com.Food_Donation.entity.FoodRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

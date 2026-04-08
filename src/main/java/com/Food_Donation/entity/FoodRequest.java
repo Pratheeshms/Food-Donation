@@ -2,6 +2,7 @@ package com.Food_Donation.entity;
 
 import com.Food_Donation.enums.DeliveryType;
 import com.Food_Donation.enums.FoodRequestStatus;
+import com.Food_Donation.enums.FoodType;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -21,6 +22,8 @@ public class FoodRequest extends AbstractEntity{
     private LocalDateTime approvalTime;
     private LocalDateTime pickupTime; //time set by ngo guy
     private String remarks;
+    @Enumerated(EnumType.STRING)
+    private FoodType foodType;
 
     @ManyToOne
     @JoinColumn(name = "food_id")

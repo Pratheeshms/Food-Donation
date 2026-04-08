@@ -2,7 +2,9 @@ package com.Food_Donation.controller;
 
 import com.Food_Donation.configuration.SecurityConfig;
 import com.Food_Donation.dto.AvailableFoodDTO;
+import com.Food_Donation.dto.AvailableFoodPatchDTO;
 import com.Food_Donation.dto.NGORegistrationDTO;
+import com.Food_Donation.dto.PaginationResponse;
 import com.Food_Donation.entity.AvailableFood;
 import com.Food_Donation.service.AvailableFoodService;
 import com.Food_Donation.utils.AppConstant;
@@ -56,10 +58,26 @@ public class AvailableFoodController {
     }
 
     @PatchMapping("/stock-status")
-    public ResponseEntity<AvailableFoodDTO> stock(@RequestBody AvailableFoodDTO availableFoodDTO)
+    public ResponseEntity<AvailableFoodPatchDTO> stock(@RequestBody AvailableFoodPatchDTO availableFoodPatchDTO)
     {
-        AvailableFoodDTO saved = availableFoodService.stockStatus(availableFoodDTO.getId(), availableFoodDTO);
+        AvailableFoodPatchDTO saved = availableFoodService.stockStatus(availableFoodPatchDTO.getId(), availableFoodPatchDTO);
 
         return ResponseEntity.ok().body(saved);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AvailableFoodDTO> getFood(@PathVariable Long id)
+    {
+        AvailableFoodDTO availableFoodDTO = availableFoodService.findById(id);
+
+        return ResponseEntity.ok().body(availableFoodDTO);
+    }
+
+    @GetMapping()
+    public ResponseEntity<PaginationResponse<AvailableFoodDTO>> getAll(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size)
+    {
+        return ResponseEntity.ok(availableFoodService.findAll(page, size));
     }
 }

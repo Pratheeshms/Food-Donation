@@ -20,9 +20,8 @@ public class AvailableFoodDTO extends AbstractDTO {
     private String foodType;
     private BigDecimal quantity;
     private String description;
-//    private LocalDateTime cookedTime;
-@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-private LocalDateTime expiryTime;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime expiryTime;
     private FoodStatus status;
     private Long restaurantId;
 
